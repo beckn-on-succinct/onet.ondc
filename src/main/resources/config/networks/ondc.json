@@ -1,6 +1,6 @@
 {
   "self_registration_supported": false,
-  "base_url": "https://pilot-gateway-1.beckn.nsdl.co.in",
+    "base_url": "https://pilot-gateway-1.beckn.nsdl.co.in",
   "registry_url": "https://pilot-gateway-1.beckn.nsdl.co.in",
   "domains": [
     {"name":"logistics","id": "nic2004:55204","version": "","schema": "/config/networks/logistics_ondc.yaml" ,"extension_package": "in.succinct.beckn.ondc.logistics"},

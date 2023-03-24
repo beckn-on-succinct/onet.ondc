@@ -5,6 +5,9 @@ import in.succinct.bpp.core.adaptor.CommerceAdaptor;
 import in.succinct.bpp.core.adaptor.NetworkAdaptor;
 import in.succinct.bpp.core.adaptor.api.NetworkApiAdaptor;
 import in.succinct.bpp.search.adaptor.SearchAdaptor;
+import in.succinct.onet.ondc.db.model.BecknOrderMeta;
+
+import java.util.Map;
 
 public class OndcApiAdaptor extends NetworkApiAdaptor {
     OndcApiAdaptor(NetworkAdaptor networkAdaptor) {
@@ -22,4 +25,14 @@ public class OndcApiAdaptor extends NetworkApiAdaptor {
     }
 
 
+    @Override
+    public void call(CommerceAdaptor adaptor, Map<String, String> headers, Request request, Request response) {
+        super.call(adaptor, headers, request, response);
+        adaptor.getOrderMeta().getRawRecord().getAsProxy(BecknOrderMeta.class).mineTransactionLines(getNetworkAdaptor(),adaptor);
+    }
+
+    @Override
+    public void callback(CommerceAdaptor adaptor, Request reply) {
+        super.callback(adaptor, reply);
+    }
 }

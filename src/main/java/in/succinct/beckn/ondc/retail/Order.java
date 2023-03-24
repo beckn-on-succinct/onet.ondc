@@ -10,6 +10,10 @@ public class Order extends in.succinct.beckn.Order {
 
     public Order() { super(); }
 
+    public Order(String payload){
+        super(payload);
+    }
+
     @Override
     public Cancellation getCancellation(){
         return get(Cancellation.class,"@org/ondc/cancellation");
