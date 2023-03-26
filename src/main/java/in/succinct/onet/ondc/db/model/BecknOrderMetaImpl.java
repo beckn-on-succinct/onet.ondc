@@ -13,8 +13,6 @@ import in.succinct.beckn.Context;
 import in.succinct.beckn.Item;
 import in.succinct.beckn.Order;
 import in.succinct.beckn.Order.Status;
-import in.succinct.bpp.core.adaptor.CommerceAdaptor;
-import in.succinct.bpp.core.adaptor.NetworkAdaptor;
 
 import java.util.Date;
 
@@ -23,17 +21,13 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
         super(meta);
     }
 
-    public void mineTransactionLines(NetworkAdaptor networkAdaptor, CommerceAdaptor commerceAdaptor){
-        TaskManager.instance().executeAsync(new MineTransactionLineTask(getProxy(),networkAdaptor,commerceAdaptor),false);
+    public void mineTransactionLines(){
+        TaskManager.instance().executeAsync(new MineTransactionLineTask(getProxy()),false);
     }
     public static class MineTransactionLineTask implements Task {
         BecknOrderMeta meta;
-        NetworkAdaptor networkAdaptor;
-        CommerceAdaptor commerceAdaptor;
-        public MineTransactionLineTask(BecknOrderMeta  meta, NetworkAdaptor networkAdaptor, CommerceAdaptor commerceAdaptor){
+        public MineTransactionLineTask(BecknOrderMeta  meta){
             this.meta = meta;
-            this.networkAdaptor = networkAdaptor;
-            this.commerceAdaptor = commerceAdaptor;
         }
 
 
@@ -103,7 +97,7 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                         break;
                     }
                 }
-
+                line.save();
             }
 
 

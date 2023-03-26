@@ -25,14 +25,5 @@ public class OndcApiAdaptor extends NetworkApiAdaptor {
     }
 
 
-    @Override
-    public void call(CommerceAdaptor adaptor, Map<String, String> headers, Request request, Request response) {
-        super.call(adaptor, headers, request, response);
-        adaptor.getOrderMeta().getRawRecord().getAsProxy(BecknOrderMeta.class).mineTransactionLines(getNetworkAdaptor(),adaptor);
-    }
-
-    @Override
-    public void callback(CommerceAdaptor adaptor, Request reply) {
-        super.callback(adaptor, reply);
-    }
+    
 }
