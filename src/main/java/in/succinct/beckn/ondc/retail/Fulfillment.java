@@ -44,11 +44,12 @@ public class Fulfillment extends in.succinct.beckn.Fulfillment {
     }
     @Override
     public Duration getTAT(){
-        return Duration.parse(get("@org/ondc/TAT"));
+        String tat = get("@org/ondc/TAT");
+        return tat == null ? null : Duration.parse(tat);
     }
     @Override
-    public void setTAT(Duration TAT){
-        set("@org/ondc/TAT",TAT.toString());
+    public void setTAT(Duration tat){
+        set("@org/ondc/TAT",tat == null ? null : tat.toString());
     }
 
 

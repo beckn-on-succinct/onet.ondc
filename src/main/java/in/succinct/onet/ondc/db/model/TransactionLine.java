@@ -4,6 +4,7 @@ import com.venky.swf.db.annotations.column.COLUMN_DEF;
 import com.venky.swf.db.annotations.column.defaulting.StandardDefault;
 import com.venky.swf.db.annotations.column.ui.HIDDEN;
 import com.venky.swf.db.annotations.column.validations.Enumeration;
+import com.venky.swf.db.annotations.model.EXPORTABLE;
 import com.venky.swf.db.model.Model;
 import in.succinct.bpp.core.db.model.BecknOrderMeta;
 
@@ -16,6 +17,7 @@ public interface TransactionLine extends Model {
             // (MSN/ ISN)"	Order Status	Name of Seller	Seller Pincode	Seller City	SKU Name	SKU Code	Order Category (F&B/ Grocery/ Home & Decor)	Ready to Ship At Date & Time	Shipped At Date & Time	Delivered At Date & Time	Delivery Type (On-network/ Off-network)	Logistics Seller NP Name (For on-network delivery)	Logistics Network Order Id (For on-network delivery)	Logistics Network Transaction Id (For on-network delivery)	Delivery City	Delivery Pincode	Cancelled At Date & Time	Cancelled By (Buyer/ Seller/ Logistics)	Cancellation Reason / Return Reason (Network Error Description)	Total Shipping Charges	Total Order Value	Total Refund Amount
 
     @HIDDEN
+    @EXPORTABLE(value = false)
     public Long getBecknOrderMetaId();
     public void setBecknOrderMetaId(Long id);
     public BecknOrderMeta getBecknOrderMeta();
@@ -105,8 +107,8 @@ public interface TransactionLine extends Model {
     public void setDeliveryPincode(String deliveryPincode);
 
 
-    public Timestamp getCancelledAt();
-    public void setCancelledAt(Timestamp cancelledAt);
+    public String getCancelledAt();
+    public void setCancelledAt(String cancelledAt);
 
 
     @Enumeration("Buyer,Seller,Logistics")

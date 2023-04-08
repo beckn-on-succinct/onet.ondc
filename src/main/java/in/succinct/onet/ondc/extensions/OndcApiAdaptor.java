@@ -25,5 +25,5 @@ public class OndcApiAdaptor extends NetworkApiAdaptor {
     }
 
 
-    
+
 }
