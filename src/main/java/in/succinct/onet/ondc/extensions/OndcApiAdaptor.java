@@ -4,26 +4,21 @@ import in.succinct.beckn.Request;
 import in.succinct.bpp.core.adaptor.CommerceAdaptor;
 import in.succinct.bpp.core.adaptor.NetworkAdaptor;
 import in.succinct.bpp.core.adaptor.api.NetworkApiAdaptor;
-import in.succinct.bpp.search.adaptor.SearchAdaptor;
-import in.succinct.onet.ondc.db.model.BecknOrderMeta;
-
-import java.util.Map;
 
 public class OndcApiAdaptor extends NetworkApiAdaptor {
     OndcApiAdaptor(NetworkAdaptor networkAdaptor) {
         super(networkAdaptor);
     }
 
+
     @Override
-    public void search(CommerceAdaptor adaptor, Request request, Request reply) {
-        new SearchAdaptor(adaptor).search(request,reply);
+    public void issue(CommerceAdaptor adaptor, Request request, Request reply) {
+
+        super.issue(adaptor, request, reply);
     }
 
     @Override
-    public void select(CommerceAdaptor adaptor, Request request, Request reply) {
-        new SearchAdaptor(adaptor).select(request,reply);
+    public void issue_status(CommerceAdaptor adaptor, Request request, Request reply) {
+        super.issue_status(adaptor, request, reply);
     }
-
-
-
 }
