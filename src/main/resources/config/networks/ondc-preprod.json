@@ -1,23 +1,35 @@
 {
   "self_registration_supported": false,
   "base_url": "https://preprod.registry.ondc.org/ondc",
-  "registry_url": "https://preprod.registry.ondc.org/ondc",
-  "registry" : {
-      "subscriber_id" : "preprod.registry.ondc.org",
-      "subscriber_url" : "https://preprod.registry.ondc.org/ondc",
-      "encr_public_key" : "MCowBQYDK2VuAyEAa9Wbpvd9SsrpOZFcynyt/TO3x0Yrqyys4NUGIvyxX2Q="
+  "registry": {
+    "subscriber_id": "preprod.registry.ondc.org",
+    "subscriber_url": "https://preprod.registry.ondc.org/ondc",
+    "encr_public_key": "MCowBQYDK2VuAyEAa9Wbpvd9SsrpOZFcynyt/TO3x0Yrqyys4NUGIvyxX2Q=",
+    "type": "LREG"
   },
   "extension_package": "in.succinct.beckn.ondc.common",
   "domains": [
-    {"name":"logistics","id": "nic2004:55204","version": "","schema": "/config/networks/logistics_ondc.yaml" ,"extension_package": "in.succinct.beckn.ondc.logistics"},
-    {"name":"local_retail","id": "nic2004:52110","version": "","schema": "/config/networks/local_retail_ondc.yaml", "extension_package": "in.succinct.beckn.ondc.retail"}
+    {
+      "name": "logistics",
+      "id": "nic2004:55204",
+      "version": "",
+      "schema": "/config/networks/logistics_ondc.yaml",
+      "extension_package": "in.succinct.beckn.ondc.logistics"
+    },
+    {
+      "name": "local_retail",
+      "id": "nic2004:52110",
+      "version": "",
+      "schema": "/config/networks/local_retail_ondc.yaml",
+      "extension_package": "in.succinct.beckn.ondc.retail"
+    }
   ],
-  "igm_policy" : {
+  "igm_policy": {
     "ack_minutes": 120,
-    "resolve_by_minutes_np" : 24,
-    "escalate_to_gro_within_hours" : 48 ,
-    "resolve_by_minutes_gro" : 96,
-    "escalate_to_odr_within_hours" : 24,
-    "resolve_by_days_odr" : 21
+    "resolve_by_minutes_np": 24,
+    "escalate_to_gro_within_hours": 48,
+    "resolve_by_minutes_gro": 96,
+    "escalate_to_odr_within_hours": 24,
+    "resolve_by_days_odr": 21
   }
 }

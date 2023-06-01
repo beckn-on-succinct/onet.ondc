@@ -47,7 +47,8 @@ public class Item extends in.succinct.beckn.Item {
 
     @Override
     public Duration getReturnWindow() {
-        return Duration.parse(get("@ondc/org/return_window"));
+        String rw = get("@ondc/org/return_window");
+        return rw == null ? null : Duration.parse(rw);
     }
 
     @Override
