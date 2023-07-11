@@ -21,6 +21,21 @@
       "version": "",
       "schema": "/config/networks/local_retail_ondc.yaml",
       "extension_package": "in.succinct.beckn.ondc.retail"
+    },
+    {
+      "name": "recon",
+      "id": "ONDC:NTS10",
+      "version": "",
+      "schema": "/config/networks/rsp.yaml",
+      "extension_package": "in.succinct.beckn.ondc.rsp"
     }
-  ]
+  ],
+  "igm_policy": {
+    "ack_minutes": 120,
+    "resolve_by_minutes_np": 24,
+    "escalate_to_gro_within_hours": 48,
+    "resolve_by_minutes_gro": 96,
+    "escalate_to_odr_within_hours": 24,
+    "resolve_by_days_odr": 21
+  }
 }

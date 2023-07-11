@@ -12,21 +12,27 @@ import in.succinct.beckn.Descriptor;
 import in.succinct.beckn.Faq;
 import in.succinct.beckn.Issue;
 import in.succinct.beckn.Issue.EscalationLevel;
+import in.succinct.beckn.Item;
+import in.succinct.beckn.Items;
+import in.succinct.beckn.Measure;
+import in.succinct.beckn.Message;
 import in.succinct.beckn.Note;
 import in.succinct.beckn.Note.Action;
 import in.succinct.beckn.Note.Notes;
 import in.succinct.beckn.Note.RepresentativeAction;
 import in.succinct.beckn.Order;
 import in.succinct.beckn.Person;
+import in.succinct.beckn.Quantity;
 import in.succinct.beckn.Representative;
 import in.succinct.beckn.Representative.Complainant;
 import in.succinct.beckn.Representative.Representatives;
-import in.succinct.beckn.Representative.Role;
 import in.succinct.beckn.Request;
-import in.succinct.beckn.Resolution;
-import in.succinct.bpp.core.adaptor.IssueTracker;
-import in.succinct.bpp.core.adaptor.IssueTrackerFactory;
-import in.succinct.bpp.core.db.model.ProviderConfig.IssueTrackerConfig;
+import in.succinct.beckn.Role;
+import in.succinct.bpp.core.adaptor.CommerceAdaptor;
+import in.succinct.bpp.core.adaptor.NetworkAdaptor;
+import in.succinct.bpp.core.adaptor.NetworkAdaptorFactory;
+import in.succinct.bpp.core.adaptor.igm.IssueTrackerFactory;
+import in.succinct.bpp.core.extensions.SuccinctIssueTracker;
 import in.succinct.onet.ondc.extensions.OndcIssueTracker.GRO.GroType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,23 +41,24 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OndcIssueTracker extends IssueTracker {
+public class OndcIssueTracker extends SuccinctIssueTracker {
 
     static {
         IssueTrackerFactory.getInstance().registerAdaptor("ondc", OndcIssueTracker.class);
     }
-    public OndcIssueTracker(IssueTrackerConfig config) {
-        super(config);
+    public OndcIssueTracker(CommerceAdaptor adaptor) {
+        super(adaptor);
     }
 
     @Override
     public void save(Request oRequest, Request oResponse) {
         Request bRequest = new Request();
         Request bResponse = new Request();
+        bResponse.setContext(oResponse.getContext());
+        bResponse.setMessage(new Message());
 
         o2b(oRequest,bRequest);
-        IssueTracker internal  = IssueTrackerFactory.getInstance().createIssueTracker("internal",getConfig());
-        internal.save(bRequest,bResponse);
+        super.save(bRequest,bResponse);
         b2o(bResponse,oResponse);
     }
 
@@ -61,16 +68,32 @@ public class OndcIssueTracker extends IssueTracker {
         o2b(oRequest,bRequest);
 
         Request bResponse = new Request();
+        bResponse.setContext(oResponse.getContext());
+        bResponse.setMessage(new Message());
 
-        IssueTracker internal  = IssueTrackerFactory.getInstance().createIssueTracker("internal",getConfig());
-        internal.status(bRequest,bResponse);
+        super.status(bRequest,bResponse);
         b2o(bResponse,oResponse);
+    }
+
+    public Request createNetworkResponse(Request becknResponse){
+        Request oResponse = new Request();
+
+        NetworkAdaptor networkAdaptor = NetworkAdaptorFactory.getInstance().getAdaptor(becknResponse.getContext().getNetworkId());
+        networkAdaptor.getApiAdaptor().createReplyContext(getAdaptor().getSubscriber(),becknResponse,oResponse);
+        oResponse.getContext().setNetworkId(becknResponse.getContext().getNetworkId());
+        b2o(becknResponse,oResponse);
+        return oResponse;
     }
 
 
     private void o2b(Request source, Request target){
         target.setContext(source.getContext());
+        target.setMessage(new Message());
         target.getMessage().setIssue(new Issue());
+        if (source.getMessage().getIssue() == null){
+            source.getMessage().setIssue(new Issue());
+            source.getMessage().getIssue().setId(source.getMessage().get("issue_id"));
+        }
 
         o2bIssue(target.getContext(),source.getMessage().getIssue(),target.getMessage().getIssue());
     }
@@ -78,33 +101,66 @@ public class OndcIssueTracker extends IssueTracker {
 
         target.setId(source.getId());
         target.setRepresentatives(new Representatives());
-        target.setNotes(new Notes());
-        Note firstNote = new Note();
-        firstNote.setDescription(source.get(Descriptor.class,"description"));
-        firstNote.setId(source.getId()); // First note is for the issue.
-        target.getNotes().add(firstNote);
 
-        target.setOrder(source.get(Order.class,"order_details"));
+        target.setNotes(new Notes());
+
+        Order order = source.get(Order.class,"order_details");
+        if (order != null) {
+            target.setOrder(order);
+            Items items = target.getOrder().getItems();
+            for (Item item : items) {
+                Number quantity = item.get("quantity");
+                item.rm("quantity");
+                if (quantity != null) {
+                    Quantity q = new Quantity();
+                    q.setCount(quantity.intValue());
+                    item.setQuantity(q);
+                }
+            }
+        }
+
         target.setIssueCategory(source.getIssueCategory());
         target.setIssueSubCategory(source.getIssueSubCategory());
         target.setEscalationLevel(source.getEnum(EscalationLevel.class,"issue_type",EscalationLevel.convertor));
         target.setExpectedResponseTime(source.getExpectedResponseTime());
         target.setExpectedResolutionTime(source.getExpectedResolutionTime());
         target.setStatus(source.getStatus());
-
+        target.setCreatedAt(source.getCreatedAt());
+        target.setUpdatedAt(source.getUpdatedAt());
 
         o2bComplainant(context,source,target);
         o2bOdr(context,source,target);
         o2bRating(context,source,target);
         o2bResolutionProvider(context,source,target);
         o2bResolution(context,source,target);
+
+        Descriptor description = source.get(Descriptor.class,"description");
+        if (description != null) {
+            Note firstNote = new Note();
+            firstNote.setDescription(description);
+            firstNote.setId(source.getId()); // First note is for the issue.
+            firstNote.setCreatedAt(source.getCreatedAt());
+            firstNote.setCreatedBy(target.getComplainant());
+            firstNote.setAction(new Action());
+            firstNote.getAction().setComplainantAction(RepresentativeAction.OPEN);
+            target.getNotes().add(firstNote);
+        }
         o2bNotes(context,source,target);
+
     }
     private void o2bComplainant(Context context,Issue source, Issue target){
         Complainant internalComplainant = new Complainant();
         Organization complainant_info = source.get(Organization.class, "complainant_info");
-        IssueSource issueSource = source.get(IssueSource.class,"source");
 
+        IssueSource issueSource = source.get(IssueSource.class,"source");
+        if (complainant_info == null || issueSource == null){
+            return;
+        }
+
+        if (complainant_info.getOrg() == null){
+            complainant_info.setOrg(new Org());
+            complainant_info.getOrg().setName(issueSource.getNetworkParticipantId());
+        }
         internalComplainant.setPerson(complainant_info.getPerson());
         internalComplainant.setContact(complainant_info.getContact());
         internalComplainant.setOrganization(complainant_info.getOrg());
@@ -183,12 +239,21 @@ public class OndcIssueTracker extends IssueTracker {
         }
     }
     private void o2bResolutionProvider(Context context, Issue source, Issue target){
+        if (target.getComplainant() == null){
+            return;
+        }
 
         String respondentSubscriberId = ObjectUtil.equals(context.getBapId(),target.getComplainant().getSubscriberId())? context.getBppId() : context.getBapId();
 
         ResolutionProvider provider = source.get(ResolutionProvider.class, "resolution_provider");
+
+
         if (provider != null){
             RespondentInfo respondentInfo = provider.getRespondentInfo();
+            if (respondentInfo.getOrganization().getOrg() == null){
+                respondentInfo.getOrganization().setOrg(new Org());
+                respondentInfo.getOrganization().getOrg().setName(respondentSubscriberId);
+            }
 
             Representative resolutionProvider = new Representative();
             resolutionProvider.setChatUrl(respondentInfo.getResolutionSupport().getRespondentChatLink());
@@ -238,6 +303,9 @@ public class OndcIssueTracker extends IssueTracker {
         }
     }
     private void o2bNotes(Context context, Issue source, Issue target) {
+        if (target.getComplainant() == null){
+            return;
+        }
         String respondentSubscriberId = ObjectUtil.equals(context.getBapId(),target.getComplainant().getSubscriberId())? context.getBppId() : context.getBapId();
 
         IssueActions issueActions = source.get(IssueActions.class,"issue_action");
@@ -317,7 +385,8 @@ public class OndcIssueTracker extends IssueTracker {
 
     private void b2o(Request source, Request target){
         target.setContext(source.getContext());
-        target.getMessage().setIssue(new Issue());
+        target.setMessage(target.getObjectCreator().create(Message.class));
+        target.getMessage().setIssue(target.getObjectCreator().create(Issue.class));
 
         b2oIssue(target.getContext(),source.getMessage().getIssue(),target.getMessage().getIssue());
     }
@@ -326,15 +395,35 @@ public class OndcIssueTracker extends IssueTracker {
         target.setId(source.getId());
         Representatives representatives = source.getRepresentatives();
         Notes notes = source.getNotes();
+        if (notes == null){
+            notes = new Notes();
+            source.setNotes(notes);
+        }
         Note baseNote = notes.get(target.getId());
-        target.set("description",baseNote.getDescription());
-        target.set("order_details",source.getOrder());
+        if (baseNote != null) {
+            target.set("description", baseNote.getDescription());
+        }
+
+
+        Items items = source.getOrder().getItems();
+        for (Item item : items){
+            Quantity quantity = item.getQuantity();
+            item.rm("quantity");
+            item.rm("extended_attributes");
+            item.set("quantity",quantity.getCount());
+        }
+        target.set  ("order_details",source.getOrder().getInner());
+        JSONObject o = target.get("order_details");
+        o.remove("extended_attributes");
+
         target.setIssueCategory(source.getIssueCategory());
         target.setIssueSubCategory(source.getIssueSubCategory());
         target.setEnum("issue_type",source.getEscalationLevel(),EscalationLevel.convertor);
         target.setExpectedResponseTime(source.getExpectedResponseTime());
         target.setExpectedResolutionTime(source.getExpectedResolutionTime());
         target.setStatus(source.getStatus());
+        target.setCreatedAt(source.getCreatedAt());
+        target.setUpdatedAt(source.getUpdatedAt());
 
 
         b2oComplainant(context,source,target);
@@ -440,6 +529,7 @@ public class OndcIssueTracker extends IssueTracker {
             target.set("resolution_provider",provider);
             provider.setRespondentInfo(new RespondentInfo());
             RespondentInfo respondentInfo = provider.getRespondentInfo();
+
             respondentInfo.setResolutionSupport(new ResolutionSupport());
 
             respondentInfo.getResolutionSupport().setRespondentChatLink(resolutionProvider.getChatUrl());
@@ -572,8 +662,10 @@ public class OndcIssueTracker extends IssueTracker {
         public AdditionalInfosRequired(String payload) {
             super(payload);
         }
+
     }
     public static class AdditionalInfoRequired extends BecknObject {
+
         public SupplementaryInformation getInfoRequired(){
             return get(SupplementaryInformation.class, "info_required");
         }
@@ -616,6 +708,16 @@ public class OndcIssueTracker extends IssueTracker {
         }
         public void setNetworkIssueId(String network_issue_id){
             set("network_issue_id",network_issue_id);
+        }
+
+        @Override
+        public String getResolutionRemarks() {
+            return get("short_desc");
+        }
+
+        @Override
+        public void setResolutionRemarks(String resolution_remarks) {
+            set("short_desc",resolution_remarks);
         }
 
         @Override
@@ -668,10 +770,10 @@ public class OndcIssueTracker extends IssueTracker {
     }
     public static class RespondentInfo extends BecknObject {
         public RespondentType getRespondentType(){
-            return getEnum(RespondentType.class, "type");
+            return getEnum(RespondentType.class, "type",RespondentType.convertor);
         }
         public void setRespondentType(RespondentType type){
-            setEnum("type",type);
+            setEnum("type",type,RespondentType.convertor);
         }
         public String getPosId(){
             return get("pos_id");
@@ -763,8 +865,9 @@ public class OndcIssueTracker extends IssueTracker {
     public enum RespondentType {
         INTERFACING_NP,
         TRANSACTION_COUNTERPARTY_NP,
-        CASCADED_COUNTERPARTY_NP,
+        CASCADED_COUNTERPARTY_NP;
 
+        public static EnumConvertor<RespondentType> convertor = new EnumConvertor<>(RespondentType.class);
     }
     public enum IssueRating {
         THUMBS_UP,THUMBS_DOWN;
@@ -856,6 +959,11 @@ public class OndcIssueTracker extends IssueTracker {
         }
     }
     public static class Org extends in.succinct.beckn.Organization {
+        @Override
+        public boolean isExtendedAttributesDisplayed() {
+            return false;
+        }
+
         public Org() {
         }
     }
@@ -901,10 +1009,10 @@ public class OndcIssueTracker extends IssueTracker {
     }
     public static class ComplainantAction extends BecknObject {
         public String getRemarks(){
-            return get("remarks");
+            return get("short_desc");
         }
         public void setRemarks(String remarks){
-            set("remarks",remarks);
+            set("short_desc",remarks);
         }
         public RepresentativeAction getAction(){
             return  getEnum(RepresentativeAction.class, "complainant_action");
@@ -1008,10 +1116,10 @@ public class OndcIssueTracker extends IssueTracker {
         }
 
         public IssueSourceType getIssueSourceType(){
-            return getEnum(IssueSourceType.class, "issue_source_type", IssueSourceType.convertor);
+            return getEnum(IssueSourceType.class, "type", IssueSourceType.convertor);
         }
         public void setIssueSourceType(IssueSourceType issue_source_type){
-            setEnum("issue_source_type",issue_source_type,IssueSourceType.convertor);
+            setEnum("type",issue_source_type,IssueSourceType.convertor);
         }
 
 

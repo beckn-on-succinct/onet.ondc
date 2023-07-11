@@ -22,7 +22,15 @@
       "version": "",
       "schema": "/config/networks/local_retail_ondc.yaml",
       "extension_package": "in.succinct.beckn.ondc.retail"
+    },
+    {
+      "name": "recon",
+      "id" : "ONDC:NTS10",
+      "version": "",
+      "schema": "/config/networks/rsp.yaml",
+      "extension_package": "in.succinct.beckn.ondc.rsp"
     }
+
   ],
   "igm_policy": {
     "ack_minutes": 120,
