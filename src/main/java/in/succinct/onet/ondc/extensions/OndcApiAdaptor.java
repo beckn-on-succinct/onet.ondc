@@ -1,6 +1,5 @@
 package in.succinct.onet.ondc.extensions;
 
-import in.succinct.beckn.Message;
 import in.succinct.beckn.Request;
 import in.succinct.bpp.core.adaptor.CommerceAdaptor;
 import in.succinct.bpp.core.adaptor.NetworkAdaptor;

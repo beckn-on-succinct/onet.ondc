@@ -1,17 +1,20 @@
 package in.succinct.onet.ondc.db.model;
 
+import com.venky.network.Network;
 import com.venky.swf.db.annotations.column.COLUMN_DEF;
 import com.venky.swf.db.annotations.column.defaulting.StandardDefault;
+import com.venky.swf.db.annotations.column.indexing.Index;
 import com.venky.swf.db.annotations.column.ui.HIDDEN;
 import com.venky.swf.db.annotations.column.validations.Enumeration;
 import com.venky.swf.db.annotations.model.EXPORTABLE;
+import com.venky.swf.db.annotations.model.MENU;
 import com.venky.swf.db.model.Model;
 import in.succinct.bpp.core.db.model.BecknOrderMeta;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+@MENU("Dashboard")
 public interface TransactionLine extends Model {
     // S. No.	Buyer NP Name	Seller NP Name	Order Create Date & Time	Network Order Id	Network Transaction Id	Seller NP Order Id	Item Id	Qty	"Seller NP Type
             // (MSN/ ISN)"	Order Status	Name of Seller	Seller Pincode	Seller City	SKU Name	SKU Code	Order Category (F&B/ Grocery/ Home & Decor)	Ready to Ship At Date & Time	Shipped At Date & Time	Delivered At Date & Time	Delivery Type (On-network/ Off-network)	Logistics Seller NP Name (For on-network delivery)	Logistics Network Order Id (For on-network delivery)	Logistics Network Transaction Id (For on-network delivery)	Delivery City	Delivery Pincode	Cancelled At Date & Time	Cancelled By (Buyer/ Seller/ Logistics)	Cancellation Reason / Return Reason (Network Error Description)	Total Shipping Charges	Total Order Value	Total Refund Amount
@@ -22,10 +25,12 @@ public interface TransactionLine extends Model {
     public void setBecknOrderMetaId(Long id);
     public BecknOrderMeta getBecknOrderMeta();
 
-    
+
+    @Index
     public String getBuyerNPName();
     public void setBuyerNPName(String buyerNPName);
 
+    @Index
     public String getSellerNPName();
     public void setSellerNPName(String sellerNPName);
 
@@ -36,6 +41,7 @@ public interface TransactionLine extends Model {
     public String getNetworkOrderId();
     public void setNetworkOrderId(String orderId);
 
+    @Index
     public String getNetworkTransactionId();
     public void setNetworkTransactionId(String networkTransactionId);
 
@@ -55,10 +61,19 @@ public interface TransactionLine extends Model {
     public void setSellerNPType(String sellerNPType);
 
 
+    @Index
     public String getOrderStatus();
     public void setOrderStatus(String orderStatus);
 
+    @Index
+    public String getFulfillmentStatus();
+    public void setFulfillmentStatus(String fulfillmentStatus);
 
+    @Index
+    public String getReturnStatus();
+    public void setReturnStatus(String returnStatus);
+
+    @Index
     public String getNameOfTheSeller();
     public void setNameOfTheSeller(String nameOfTheSeller);
 
@@ -94,15 +109,19 @@ public interface TransactionLine extends Model {
     public String getDeliveryType();
     public void setDeliveryType(String deliveryType);
 
+    @Index
     public String getLogisticsSellerNPName();
     public void setLogisticsSellerNPName(String logisticsSellerNPName);
-    
+
+    @Index
     public String getLogisticsNetworkTransactionId();
     public void setLogisticsNetworkTransactionId(String logisticsNetworkTransactionId);
 
+    @Index
     public String getDeliveryCity();
     public void setDeliveryCity(String deliveryCity);
 
+    @Index
     public String getDeliveryPincode();
     public void setDeliveryPincode(String deliveryPincode);
 
@@ -111,7 +130,7 @@ public interface TransactionLine extends Model {
     public void setCancelledAt(String cancelledAt);
 
 
-    @Enumeration("Buyer,Seller,Logistics")
+    @Enumeration(enumClass = "in.succinct.beckn.Cancellation$CancelledBy")
     public String getCancelledBy();
     public void setCancelledBy(String cancelledBy);
 
@@ -131,9 +150,13 @@ public interface TransactionLine extends Model {
     public double getTotalRefundAmount();
     public void setTotalRefundAmount(double totalRefundAmount);
 
+    public String getReturnReason();
+    public void setReturnReason(String returReason);
 
 
-
+    @Index
+    public String getNetworkId();
+    public void setNetworkId(String networkId);
 
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 

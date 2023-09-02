@@ -144,11 +144,11 @@ public class Payment extends in.succinct.beckn.Payment {
 
     @Override
     public SettlementDetails getSettlementDetails(){
-        return get(SettlementDetails.class,"@org/ondc/settlement_details");
+        return get(SettlementDetails.class,"@ondc/org/settlement_details");
     }
     @Override
     public void setSettlementDetails(SettlementDetails settlement_details){
-        set("@org/ondc/settlement_details",settlement_details.getInner());
+        set("@ondc/org/settlement_details",settlement_details.getInner());
     }
 
 

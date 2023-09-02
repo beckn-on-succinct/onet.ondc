@@ -1,6 +1,7 @@
 {
   "self_registration_supported": false,
   "base_url": "https://pilot-gateway-1.beckn.nsdl.co.in",
+  "key_expiry_grace_period" : 2880,
   "registry": {
     "subscriber_id": "pilot-gateway-1.beckn.nsdl.co.in",
     "subscriber_url": "https://pilot-gateway-1.beckn.nsdl.co.in",

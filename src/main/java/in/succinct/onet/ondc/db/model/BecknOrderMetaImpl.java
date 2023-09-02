@@ -1,21 +1,33 @@
 package in.succinct.onet.ondc.db.model;
 
+import com.venky.core.util.Bucket;
 import com.venky.core.util.ObjectUtil;
 import com.venky.swf.db.Database;
 import com.venky.swf.db.table.ModelImpl;
 import com.venky.swf.plugins.background.core.Task;
 import com.venky.swf.plugins.background.core.TaskManager;
+import in.succinct.beckn.Amount;
 import in.succinct.beckn.BecknObject;
 import in.succinct.beckn.BreakUp.BreakUpElement;
 import in.succinct.beckn.BreakUp.BreakUpElement.BreakUpCategory;
 import in.succinct.beckn.Cancellation;
+import in.succinct.beckn.Cancellation.CancelledBy;
+import in.succinct.beckn.CancellationReasons.CancellationReasonCode;
 import in.succinct.beckn.Context;
 import in.succinct.beckn.Fulfillment.FulfillmentStatus;
+import in.succinct.beckn.Fulfillment.FulfillmentStatus.FulfillmentStatusConvertor;
 import in.succinct.beckn.Item;
 import in.succinct.beckn.Order;
+import in.succinct.beckn.Order.Return;
+import in.succinct.beckn.Order.Return.ReturnStatus;
+import in.succinct.beckn.Order.Returns;
 import in.succinct.beckn.Order.Status;
+import in.succinct.beckn.ReturnReasons.ReturnReasonCode;
+import org.json.simple.JSONObject;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
     public BecknOrderMetaImpl(BecknOrderMeta meta){
@@ -52,8 +64,26 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                 meta.setStatusUpdatedAtJson("{}");
             }
 
+            Bucket refund = new Bucket();
+            Returns returns = order.getReturns();
+            if (returns != null ){
+                for (Return ret : returns){
+                    Amount ref = ret.getRefund();
+                    if (ref != null) {
+                        refund.increment(ref.getValue());
+                    }
+                }
+            }
+            Set<String> refundedLineStatus = new HashSet<>(){{
+                add("Cancelled");
+                add("Liquidated");
+                add("Return_Delivered");
+            }} ;
+
+
             for (Item item : order.getItems()) {
                 TransactionLine line = Database.getTable(TransactionLine.class).newRecord();
+                line.setTotalRefundAmount(refund.doubleValue());
                 line.setBecknOrderMetaId(meta.getId());
                 line.setBuyerNPName(context.getBapId());
                 line.setSellerNPName(context.getBppId());
@@ -61,7 +91,14 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                 line.setNetworkTransactionId(meta.getBecknTransactionId());
                 line.setSellerNPOrderId(meta.getECommerceOrderId());
                 line.setItemId(item.getId());
-                line.setQuantity(item.getQuantity().getCount());
+                JSONObject inspectQuantity = (JSONObject) item.getInner().get("quantity");
+                if (inspectQuantity.containsKey("count")){
+                    line.setQuantity(item.getQuantity().getCount());
+                }else {
+                    line.setQuantity(item.getItemQuantity().getAllocated().getCount());
+                }
+
+                //line.setQuantity(item.getQuantity().getCount());
                 line.setOrderCategory(getCategory(item.getCategoryId()));
                 line.setSellerNPType("ISN");
                 line.setOrderStatus(order.getState().toString());
@@ -70,6 +107,7 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                 line.setSellerCity(order.getFulfillment().getStart().getLocation().getAddress().getCity());
                 line.setSKUCode(item.getDescriptor().getCode());
                 line.setSKUName(item.getDescriptor().getName());
+                line.setNetworkId(meta.getNetworkId());
 
                 Date createdAt = meta.getStatusReachedAt(Status.Accepted);
                 if (createdAt != null) {
@@ -91,6 +129,7 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                 if (deliveredAt != null) {
                     line.setDeliveredAt(TransactionLine.DATE_FORMAT.format(deliveredAt));
                 }
+
                 Date cancelledAt = meta.getStatusReachedAt(Status.Cancelled);
                 if (cancelledAt != null) {
                     line.setCancelledAt(TransactionLine.DATE_FORMAT.format(cancelledAt));
@@ -103,7 +142,7 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                 if (order.getState() == Status.Cancelled){
                     Cancellation cancellation = order.getCancellation();
                     if (cancellation != null) {
-                        line.setCancelledBy(cancellation.getCancelledBy());
+                        line.setCancelledBy(cancellation.getCancelledBy().name());
                         if (cancellation.getSelectedReason() != null && cancellation.getSelectedReason().getDescriptor() != null) {
                             line.setCancellationReason(order.getCancellation().getSelectedReason().getDescriptor().getLongDesc());
                         }
@@ -119,6 +158,25 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                         break;
                     }
                 }
+                String lineStatus = item.getTags().get("status");
+                String reason = item.getTags().get("reason_code");
+
+                if (!ObjectUtil.isVoid(lineStatus)){
+                    if (!refundedLineStatus.contains(lineStatus)){
+                         continue;
+                    }
+                    if (ObjectUtil.equals(lineStatus, "Cancelled") && !ObjectUtil.isVoid(reason)) {
+                        line.setCancellationReason(CancellationReasonCode.convertor.valueOf(reason).name());
+                        line.setCancelledBy(CancellationReasonCode.convertor.valueOf(reason).isUsableByBuyerParty() ? CancelledBy.BUYER.name() : CancelledBy.PROVIDER.name());
+                    } else {
+                        if (!ObjectUtil.isVoid(reason)) {
+                            line.setReturnReason(ReturnReasonCode.convertor.valueOf(reason).name());
+                        }
+                        line.setReturnStatus(lineStatus);
+                    }
+                }
+                line.setFulfillmentStatus(new FulfillmentStatusConvertor().toString(order.getFulfillment().getFulfillmentStatus()));
+
                 line.save();
             }
 

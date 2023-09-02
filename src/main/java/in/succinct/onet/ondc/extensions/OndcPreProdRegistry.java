@@ -9,4 +9,5 @@ public class OndcPreProdRegistry extends OndcRegistry{
     public OndcPreProdRegistry() {
         super("ondc-preprod");
     }
+
 }

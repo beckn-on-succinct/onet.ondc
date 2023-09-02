@@ -164,13 +164,7 @@ public class OndcRegistry extends NetworkAdaptor {
         return registry;
     }
 
-    @Override
-    public List<Subscriber> lookup(Subscriber subscriber,boolean onlyIfSubscribed) {
-        if (ObjectUtil.isVoid(subscriber.getCountry())){
-            subscriber.setCountry("IND");
-        }
-        return super.lookup(subscriber,onlyIfSubscribed);
-    }
+
 
 
     @Override

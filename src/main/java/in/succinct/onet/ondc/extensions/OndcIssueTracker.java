@@ -1,10 +1,10 @@
 package in.succinct.onet.ondc.extensions;
 
 import com.venky.core.util.ObjectUtil;
+import com.venky.swf.db.Database;
 import in.succinct.beckn.AdditionalProperties;
 import in.succinct.beckn.AdditionalProperties.AdditionalSources;
 import in.succinct.beckn.BecknObject;
-import in.succinct.beckn.BecknObjectBase.EnumConvertor;
 import in.succinct.beckn.BecknObjects;
 import in.succinct.beckn.Contact;
 import in.succinct.beckn.Context;
@@ -13,14 +13,13 @@ import in.succinct.beckn.Faq;
 import in.succinct.beckn.Issue;
 import in.succinct.beckn.Issue.EscalationLevel;
 import in.succinct.beckn.Item;
-import in.succinct.beckn.Items;
-import in.succinct.beckn.Measure;
 import in.succinct.beckn.Message;
 import in.succinct.beckn.Note;
 import in.succinct.beckn.Note.Action;
 import in.succinct.beckn.Note.Notes;
 import in.succinct.beckn.Note.RepresentativeAction;
 import in.succinct.beckn.Order;
+import in.succinct.beckn.Order.NonUniqueItems;
 import in.succinct.beckn.Person;
 import in.succinct.beckn.Quantity;
 import in.succinct.beckn.Representative;
@@ -33,6 +32,7 @@ import in.succinct.bpp.core.adaptor.NetworkAdaptor;
 import in.succinct.bpp.core.adaptor.NetworkAdaptorFactory;
 import in.succinct.bpp.core.adaptor.igm.IssueTrackerFactory;
 import in.succinct.bpp.core.extensions.SuccinctIssueTracker;
+import in.succinct.json.JSONAwareWrapper.EnumConvertor;
 import in.succinct.onet.ondc.extensions.OndcIssueTracker.GRO.GroType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -95,6 +95,15 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
             source.getMessage().getIssue().setId(source.getMessage().get("issue_id"));
         }
 
+        {
+            in.succinct.bpp.core.db.model.igm.Issue dbIssue = Database.getTable(in.succinct.bpp.core.db.model.igm.Issue.class).newRecord();
+            dbIssue.setIssueId(source.getMessage().getIssue().getId());
+            dbIssue = Database.getTable(in.succinct.bpp.core.db.model.igm.Issue.class).getRefreshed(dbIssue);
+            if (!dbIssue.getRawRecord().isNewRecord()){
+                Issue becknIssue = getBecknIssue(dbIssue);
+                target.getMessage().setIssue(becknIssue);
+            }
+        }
         o2bIssue(target.getContext(),source.getMessage().getIssue(),target.getMessage().getIssue());
     }
     private void o2bIssue(Context context, Issue source, Issue target){
@@ -107,7 +116,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         Order order = source.get(Order.class,"order_details");
         if (order != null) {
             target.setOrder(order);
-            Items items = target.getOrder().getItems();
+            NonUniqueItems items = target.getOrder().getItems();
             for (Item item : items) {
                 Number quantity = item.get("quantity");
                 item.rm("quantity");
@@ -149,6 +158,9 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
 
     }
     private void o2bComplainant(Context context,Issue source, Issue target){
+        if (target.getComplainant() != null){
+            return;
+        }
         Complainant internalComplainant = new Complainant();
         Organization complainant_info = source.get(Organization.class, "complainant_info");
 
@@ -261,7 +273,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
             resolutionProvider.setOrganization(respondentInfo.getOrganization().getOrg());
             resolutionProvider.setContact(respondentInfo.getOrganization().getContact());
             resolutionProvider.setPerson(respondentInfo.getOrganization().getPerson());
-            resolutionProvider.getContact().setEmail(respondentInfo.getResolutionSupport().getRespondentEmail());
+            resolutionProvider.getContact().update(respondentInfo.getResolutionSupport().getContact());
 
             if (respondentInfo.getRespondentType() == RespondentType.INTERFACING_NP) {
                 resolutionProvider.setSubscriberId(target.getComplainant().getSubscriberId());
@@ -308,7 +320,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         }
         String respondentSubscriberId = ObjectUtil.equals(context.getBapId(),target.getComplainant().getSubscriberId())? context.getBppId() : context.getBapId();
 
-        IssueActions issueActions = source.get(IssueActions.class,"issue_action");
+        IssueActions issueActions = source.get(IssueActions.class,"issue_actions");
         if (issueActions != null){
             ComplainantActions complainantActions = issueActions.getComplainantActions();
             if (complainantActions != null){
@@ -405,7 +417,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         }
 
 
-        Items items = source.getOrder().getItems();
+        NonUniqueItems items = source.getOrder().getItems();
         for (Item item : items){
             Quantity quantity = item.getQuantity();
             item.rm("quantity");
@@ -438,8 +450,14 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
 
         target.set("complainant_info",new Organization());
         Organization complainant_info = target.get(Organization.class, "complainant_info");
-        complainant_info.setOrg(new Org());
-        complainant_info.getOrg().setInner(internalComplainant.getOrganization().getInner());
+        Org org = new Org();
+
+        JSONObject object = internalComplainant.getOrganization().getInner();
+        object.remove("extended_attributes");
+
+        org.setInner(object);
+        complainant_info.setOrg(org);
+
         complainant_info.setPerson(internalComplainant.getPerson());
         complainant_info.setContact(internalComplainant.getContact());
 
@@ -541,13 +559,11 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
             //resolutionProvider.setFaqUrl(respondentInfo.getResolutionSupport().getF);
             respondentInfo.getOrganization().setContact(resolutionProvider.getContact());
             respondentInfo.getOrganization().setPerson(resolutionProvider.getPerson());
-            respondentInfo.getResolutionSupport().setRespondentEmail(resolutionProvider.getContact().getEmail());
-            if (resolutionProvider.getRole() == Role.COMPLAINANT_PLATFORM){
+            respondentInfo.getResolutionSupport().setContact(resolutionProvider.getContact());
+            if (resolutionProvider.getRole().isComplainant()){
                 respondentInfo.setRespondentType(RespondentType.INTERFACING_NP);
-            }else if (resolutionProvider.getRole() == Role.RESPONDENT_PLATFORM){
+            }else {
                 respondentInfo.setRespondentType(RespondentType.TRANSACTION_COUNTERPARTY_NP);
-            }else if (resolutionProvider.getRole() == Role.CASCADED_RESPONDENT_PLATFORM){
-                respondentInfo.setRespondentType(RespondentType.CASCADED_COUNTERPARTY_NP);
             }
 
             respondentInfo.getResolutionSupport().setAdditionalSources(resolutionProvider.getAdditionalSources());
@@ -559,6 +575,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
                     gro.setPerson(representative.getPerson());
                     String roleName = String.format("%s_GRO",respondentInfo.getRespondentType().name());
                     gro.setGroType(GroType.valueOf(roleName));
+                    respondentInfo.getResolutionSupport().getGROS().add(gro);
                 }
             });
         }
@@ -568,7 +585,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         in.succinct.beckn.Resolution resolution = source.getResolution();
         if (resolution != null){
             Resolution ondcResolution =  new Resolution();
-            target.set("resolution", ondcResolution);
+            target.setResolution(ondcResolution);
             ondcResolution.update(resolution);
             ondcResolution.setNetworkIssueId(source.getId());
         }
@@ -577,7 +594,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         String respondentSubscriberId = ObjectUtil.equals(context.getBapId(),source.getComplainant().getSubscriberId())? context.getBppId() : context.getBapId();
         Notes notes = source.getNotes();
         IssueActions issueActions = new IssueActions();
-        target.set("issue_action", issueActions);
+        target.set("issue_actions", issueActions);
         issueActions.setComplainantActions(new ComplainantActions());
         issueActions.setRespondentActions(new RespondentActions());
         Map<String,AdditionalInfoRequired> tmap = new HashMap<>();
@@ -611,9 +628,9 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
                     respondentAction.setUpdatedAt(note.getCreatedAt());
                     respondentAction.setUpdatedBy(new Organization());
                     respondentAction.getUpdatedBy().setOrg(new Org());
-                    respondentAction.getUpdatedBy().getOrg().update(source.getComplainant().getOrganization());
-                    respondentAction.getUpdatedBy().setContact(source.getComplainant().getContact());
-                    respondentAction.getUpdatedBy().setPerson(source.getComplainant().getPerson());
+                    respondentAction.getUpdatedBy().getOrg().update(note.getCreatedBy().getOrganization());
+                    respondentAction.getUpdatedBy().setContact(note.getCreatedBy().getContact());
+                    respondentAction.getUpdatedBy().setPerson(note.getCreatedBy().getPerson());
                     respondentAction.setCascadedLevel(note.getCreatedBy().getRole().getEscalation());
                     issueActions.getRespondentActions().add(respondentAction);
                 }
@@ -633,6 +650,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
 
                     tmap.put(note.getId(),additional_info_required);
                     additional_infos_required.add(additional_info_required);
+                    target.set("additional_info_required", additional_infos_required);
                 }
 
                 SupplementaryInformation req = additional_info_required.getInfoRequired();
@@ -730,20 +748,20 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         }
         @Override
         public ResolutionAction getResolutionAction(){
-            return getEnum(ResolutionAction.class, "action_triggered");
+            return getEnum(ResolutionAction.class, "action_triggered",ResolutionAction.convertor);
         }
         @Override
         public void setResolutionAction(ResolutionAction resolution_action){
-            setEnum("action_triggered",resolution_action);
+            setEnum("action_triggered",resolution_action,ResolutionAction.convertor);
         }
 
 
         public static EnumConvertor<ResolutionStatus> convertor = new EnumConvertor<>(ResolutionStatus.class) {
-            Map<ResolutionStatus,String> map = new HashMap<>(){{
+            final Map<ResolutionStatus,String> map = new HashMap<>(){{
                put(ResolutionStatus.RESOLVED,"RESOLVE");
                put(ResolutionStatus.REJECTED,"REJECT");
             }};
-            Map<String,ResolutionStatus> rmap = new HashMap<>(){{
+            final Map<String,ResolutionStatus> rmap = new HashMap<>(){{
                map.forEach((k,v)-> put(v,k));
             }};
 
@@ -802,12 +820,28 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         public void setRespondentChatLink(String respondent_chat_link){
             set("respondent_chat_link",respondent_chat_link);
         }
+
+        public Contact getContact(){
+            return getContact(false);
+        }
+        public Contact getContact(boolean create){
+            return get(Contact.class, "contact",create);
+        }
+        public void setContact(Contact contact){
+            set("contact",contact);
+        }
+
         public String getRespondentEmail(){
-            return get("respondent_email");
+            Contact contact = getContact();
+            if (contact != null){
+                return contact.getEmail();
+            }
+            return null;
         }
         public void setRespondentEmail(String respondent_email){
-            set("respondent_email",respondent_email);
+            getContact(true).setEmail(respondent_email);
         }
+
         public RespondentFaqs getRespondentFaqs(){
             return get(RespondentFaqs.class, "respondent_faqs");
         }
@@ -1072,7 +1106,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
             return get("remarks");
         }
         public void setRemarks(String remarks){
-            set("remarks",remarks);
+            set("short_desc",remarks);
         }
 
 
@@ -1104,7 +1138,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
             RESOLVED,
             NEED_MORE_INFO;
 
-            EnumConvertor<Action> convertor = new EnumConvertor<>(Action.class);
+            final EnumConvertor<Action> convertor = new EnumConvertor<>(Action.class);
         }
     }
     public static class IssueSource extends BecknObject {
