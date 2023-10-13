@@ -527,7 +527,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
 
     }
     private void b2oRating(Context context,Issue source, Issue target){
-        if (source.getBoolean("satisfied") == null){
+        if (source.isSatisfied() == null){
             target.rm("rating");
         }else if (source.isSatisfied()){
             target.setEnum("rating",IssueRating.THUMBS_UP,IssueRating.convertor);

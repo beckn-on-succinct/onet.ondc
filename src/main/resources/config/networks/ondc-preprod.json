@@ -26,6 +26,13 @@
       "extension_package": "in.succinct.beckn.ondc.retail"
     },
     {
+      "name": "Grocery",
+      "id": "ONDC:RET10",
+      "version": "",
+      "schema": "/config/networks/local_retail_ondc.yaml",
+      "extension_package": "in.succinct.beckn.ondc.retail"
+    },
+    {
       "name": "recon",
       "id" : "ONDC:NTS10",
       "version": "",

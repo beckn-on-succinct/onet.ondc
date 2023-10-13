@@ -1,5 +1,6 @@
 package in.succinct.beckn.ondc.retail;
 
+import com.venky.core.util.ObjectUtil;
 import org.json.simple.JSONObject;
 
 import java.time.Duration;
@@ -111,4 +112,28 @@ public class Item extends in.succinct.beckn.Item {
     public void setVeggiesFruits(VeggiesFruits veggies_fruits){
         set("@ondc/org/mandatory_reqs_veggies_fruits",veggies_fruits);
     }
+
+
+    @Override
+    public String getCountryOfOrigin(){
+        return getTag("origin","country");
+    }
+
+    @Override
+    public void setCountryOfOrigin(String country_of_origin){
+        setTag("origin","country",country_of_origin);
+    }
+
+    @Override
+    public Boolean isVeg(){
+
+        Object tag =  getTag("veg_nonveg","veg");
+        return tag == null ? null : ObjectUtil.equals(String.valueOf(tag),"yes");
+    }
+    @Override
+    public void setVeg(Boolean veg){
+        setTag("veg_nonveg","veg",veg == null ? null : (veg ? "yes" : "no"));
+    }
+
+
 }

@@ -1,10 +1,10 @@
 {
   "self_registration_supported": false,
-  "base_url": "https://pilot-gateway-1.beckn.nsdl.co.in",
+  "base_url": "https://staging.registry.ondc.org",
   "key_expiry_grace_period" : 2880,
   "registry": {
-    "subscriber_id": "pilot-gateway-1.beckn.nsdl.co.in",
-    "subscriber_url": "https://pilot-gateway-1.beckn.nsdl.co.in",
+    "subscriber_id": "staging.registry.ondc.org",
+    "subscriber_url": "https://staging.registry.ondc.org",
     "type": "LREG"
   },
   "extension_package": "in.succinct.beckn.ondc.common",

@@ -25,4 +25,11 @@ public class Provider extends in.succinct.beckn.Provider {
     }
 
 
+    public ServiceablityTags getServiceablityTags(){
+        return get(ServiceablityTags.class, "tags");
+    }
+    public void setServiceablityTags(ServiceablityTags tags){
+        set("tags",tags);
+    }
+
 }

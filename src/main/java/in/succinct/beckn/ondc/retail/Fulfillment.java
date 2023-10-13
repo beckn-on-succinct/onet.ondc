@@ -1,5 +1,7 @@
 package in.succinct.beckn.ondc.retail;
 
+import in.succinct.beckn.Provider.ServiceablityTags;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,36 +38,31 @@ public class Fulfillment extends in.succinct.beckn.Fulfillment {
 
     @Override
     public String getCategory(){
-        return get("@org/ondc/category");
+        return get("@ondc/org/category");
     }
     @Override
     public void setCategory(String category){
-        set("@org/ondc/category",category);
+        set("@ondc/org/category",category);
     }
     @Override
     public Duration getTAT(){
-        String tat = get("@org/ondc/TAT");
+        String tat = get("@ondc/org/TAT");
         return tat == null ? null : Duration.parse(tat);
     }
     @Override
     public void setTAT(Duration tat){
-        set("@org/ondc/TAT",tat == null ? null : tat.toString());
+        set("@ondc/org/TAT",tat == null ? null : tat.toString());
     }
 
 
     @Override
     public String getProviderName(){
-        return get("@org/ondc/provider_name");
+        return get("@ondc/org/provider_name");
     }
     @Override
     public void setProviderName(String provider_name){
-        set("@org/ondc/provider_name",provider_name);
+        set("@ondc/org/provider_name",provider_name);
     }
 
-    public ServiceablityTags getServiceablityTags(){
-        return get(ServiceablityTags.class, "tags");
-    }
-    public void setServiceablityTags(ServiceablityTags tags){
-        set("tags",tags);
-    }
+
 }

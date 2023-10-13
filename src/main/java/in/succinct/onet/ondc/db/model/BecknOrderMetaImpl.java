@@ -14,6 +14,7 @@ import in.succinct.beckn.Cancellation;
 import in.succinct.beckn.Cancellation.CancelledBy;
 import in.succinct.beckn.CancellationReasons.CancellationReasonCode;
 import in.succinct.beckn.Context;
+import in.succinct.beckn.Fulfillment;
 import in.succinct.beckn.Fulfillment.FulfillmentStatus;
 import in.succinct.beckn.Fulfillment.FulfillmentStatus.FulfillmentStatusConvertor;
 import in.succinct.beckn.Item;
@@ -23,6 +24,8 @@ import in.succinct.beckn.Order.Return.ReturnStatus;
 import in.succinct.beckn.Order.Returns;
 import in.succinct.beckn.Order.Status;
 import in.succinct.beckn.ReturnReasons.ReturnReasonCode;
+import in.succinct.beckn.TagGroups;
+import in.succinct.beckn.Tags;
 import org.json.simple.JSONObject;
 
 import java.util.Date;
@@ -158,8 +161,14 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                         break;
                     }
                 }
-                String lineStatus = item.getTags().get("status");
-                String reason = item.getTags().get("reason_code");
+                if (item.getTags() == null){
+                    item.setTags(new TagGroups());
+                }
+                Fulfillment fulfillment = order.getFulfillments().get(item.getFulfillmentId());
+
+                String lineStatus = fulfillment.getState().getDescriptor().getCode();
+
+                String reason = fulfillment.getTag("cancellation_request","reason_id");
 
                 if (!ObjectUtil.isVoid(lineStatus)){
                     if (!refundedLineStatus.contains(lineStatus)){
