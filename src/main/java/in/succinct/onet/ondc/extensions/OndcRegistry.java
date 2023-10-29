@@ -13,6 +13,7 @@ import com.venky.swf.integration.api.HttpMethod;
 import com.venky.swf.integration.api.InputFormat;
 import com.venky.swf.path.Path;
 import com.venky.swf.path._IPath;
+import com.venky.swf.plugins.background.core.TaskManager;
 import com.venky.swf.routing.Config;
 import com.venky.swf.views.BytesView;
 import com.venky.swf.views.View;
@@ -62,10 +63,13 @@ public class OndcRegistry extends NetworkAdaptor {
 
     @Override
     public void register(Subscriber subscriber) {
+        register(subscriber,ObjectUtil.equals(subscriber.getType(),Subscriber.SUBSCRIBER_TYPE_BAP) ? 1 : subscriber.isMsn() ? 3 : 2);
+    }
+     public void register(Subscriber subscriber, int opsNo) {
         Request request = new Request();
         Context context = new Context();
         context.setOperation(new Operation());
-        context.getOperation().setOpsNo(2);
+        context.getOperation().setOpsNo(opsNo);
         request.setContext(context);
 
         Message message = new Message();
@@ -79,7 +83,7 @@ public class OndcRegistry extends NetworkAdaptor {
         entity.setGst(gst);
         gst.setBusinessAddress(subscriber.getOrganization().getAddress().flatten());
         gst.setCityCode(new CityCode());
-        gst.getCityCode().add(subscriber.getCity());
+        gst.getCityCode().add(subscriber.getOrganization().getAddress().getCity());
         gst.setLegalEntityName(subscriber.getOrganization().getName());
         gst.setGstNo(subscriber.getOrganization().getSalesTaxId());
 
@@ -111,27 +115,29 @@ public class OndcRegistry extends NetworkAdaptor {
 
         NetworkParticipants networkParticipants = new NetworkParticipants();
         message.setNetworkParticipants(networkParticipants);
-        NetworkParticipant networkParticipant = new NetworkParticipant();
-        networkParticipants.add(networkParticipant);
-        networkParticipant.setDomain(subscriber.getDomain());
-        networkParticipant.setSubscriberUrl(entity.getCallbackUrl());
-        networkParticipant.setType(subscriber.getType());
-        networkParticipant.setCityCode(new CityCode());
-        networkParticipant.getCityCode().add(subscriber.getCity());
+
+        for (String domain : subscriber.getDomains()) {
+            NetworkParticipant networkParticipant = new NetworkParticipant();
+            networkParticipants.add(networkParticipant);
+            networkParticipant.setDomain(domain);
+            networkParticipant.setSubscriberUrl(entity.getCallbackUrl());
+            networkParticipant.setType(subscriber.getType());
+            networkParticipant.setCityCode(new CityCode());
+            networkParticipant.getCityCode().add(subscriber.getCity());
+            networkParticipant.setMsn(subscriber.isMsn());
+        }
 
         String sign = Request.generateSignature(message.getRequestId(),Request.getPrivateKey(subscriber.getSubscriberId(),subscriber.getUniqueKeyId()));
 
         String html = String.format("" +
                 "<html>\n" +
-                "\t  <head>\n" +
-                "\t    <metaname='ondc-site-verification'\n" +
-                "\t     content='%s' />\n" +
-                "\t   </head>\n" +
-                "\t      ondc-site-verification.html\n" +
-                "\t    <body>\n" +
-                "\t        ONDC Site Verification Page\n" +
-                "\t    </body>\n" +
-                "\t</html>"
+                "\t<head>\n" +
+                "\t\t<meta name='ondc-site-verification' content='%s' />\n" +
+                "\t</head>\n" +
+                "\t<body>\n" +
+                "\t\tONDC Site Verification Page\n" +
+                "\t</body>\n" +
+                "</html>"
                 ,sign);
 
 
@@ -143,17 +149,24 @@ public class OndcRegistry extends NetworkAdaptor {
         ObjectHolder<View> holder = new ObjectHolder<>(view);
         Registry.instance().callExtensions(Controller.SET_CACHED_RESULT_EXTENSION, CacheOperation.SET,path,holder);
 
+        TaskManager.instance().executeAsync(()->{
+            InputStream payload = new ByteArrayInputStream(formatter.toString(request.getInner()).getBytes(StandardCharsets.UTF_8));
+            Call<InputStream> call = new Call<InputStream>().url(getRegistryUrl(), "subscribe").
+                    method(HttpMethod.POST).input(payload).inputFormat(InputFormat.INPUT_STREAM).
+                    header("Content-Type", MimeType.APPLICATION_JSON.toString()).
+                    header("Accept", MimeType.APPLICATION_JSON.toString());
 
-        InputStream payload = new ByteArrayInputStream(formatter.toString(request.getInner()).getBytes(StandardCharsets.UTF_8));
-        Call<InputStream> call = new Call<InputStream>().url(getRegistryUrl(), "subscribe").
-                method(HttpMethod.POST).input(payload).inputFormat(InputFormat.INPUT_STREAM).
-                header("Content-Type", MimeType.APPLICATION_JSON.toString()).
-                header("Accept", MimeType.APPLICATION_JSON.toString());
+            JSONObject response = call.getResponseAsJson();
+            Config.instance().getLogger(getClass().getName()).info("subscribe" + "-" + request);
 
-        JSONObject response = call.getResponseAsJson();
+        },false);
 
 
-        Config.instance().getLogger(getClass().getName()).info("subscribe" + "-" + request);
+    }
+
+    @Override
+    protected void _subscribe(Subscriber subscriber) {
+        register(subscriber,6);
     }
 
     static final JSONFormatter formatter = new JSONFormatter(2);

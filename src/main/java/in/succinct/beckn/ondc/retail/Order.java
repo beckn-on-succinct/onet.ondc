@@ -155,4 +155,21 @@ public class Order extends in.succinct.beckn.Order {
     }
 
 
+    @Override
+    public String getBppTaxNumber(){
+        return getTag("bpp_terms","tax_number");
+    }
+    @Override
+    public void setBppTaxNumber(String bpp_tax_number){
+        setTag("bpp_terms","tax_number", bpp_tax_number);
+    }
+    @Override
+    public String getBapTaxNumber(){
+        return getTag("bap_terms","tax_number");
+    }
+    @Override
+    public void setBapTaxNumber(String bap_tax_number){
+        setTag("bap_terms","tax_number",bap_tax_number);
+    }
+
 }
