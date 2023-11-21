@@ -2,10 +2,9 @@
   "self_registration_supported": true,
   "subscription_needed_post_registration" : false,
   "base_url": "https://preprod.registry.ondc.org/ondc",
-  "key_expiry_grace_period" : 2880,
+  "key_expiry_grace_period" : 17520,
   "unique_key_id" : "ukId",
-  "registry": {
-    "subscriber_id": "preprod.registry.ondc.org",
+  "registry": {    "subscriber_id": "preprod.registry.ondc.org",
     "subscriber_url": "https://preprod.registry.ondc.org/ondc",
     "encr_public_key": "MCowBQYDK2VuAyEAa9Wbpvd9SsrpOZFcynyt/TO3x0Yrqyys4NUGIvyxX2Q=",
     "type": "LREG"
