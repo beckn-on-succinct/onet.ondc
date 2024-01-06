@@ -171,17 +171,16 @@ public class BecknOrderMetaImpl extends ModelImpl<BecknOrderMeta> {
                 String reason = fulfillment.getTag("cancellation_request","reason_id");
 
                 if (!ObjectUtil.isVoid(lineStatus)){
-                    if (!refundedLineStatus.contains(lineStatus)){
-                         continue;
-                    }
-                    if (ObjectUtil.equals(lineStatus, "Cancelled") && !ObjectUtil.isVoid(reason)) {
-                        line.setCancellationReason(CancellationReasonCode.convertor.valueOf(reason).name());
-                        line.setCancelledBy(CancellationReasonCode.convertor.valueOf(reason).isUsableByBuyerParty() ? CancelledBy.BUYER.name() : CancelledBy.PROVIDER.name());
-                    } else {
-                        if (!ObjectUtil.isVoid(reason)) {
-                            line.setReturnReason(ReturnReasonCode.convertor.valueOf(reason).name());
+                    if (refundedLineStatus.contains(lineStatus)) {
+                        if (ObjectUtil.equals(lineStatus, "Cancelled") && !ObjectUtil.isVoid(reason)) {
+                            line.setCancellationReason(CancellationReasonCode.convertor.valueOf(reason).name());
+                            line.setCancelledBy(CancellationReasonCode.convertor.valueOf(reason).isUsableByBuyerParty() ? CancelledBy.BUYER.name() : CancelledBy.PROVIDER.name());
+                        } else {
+                            if (!ObjectUtil.isVoid(reason)) {
+                                line.setReturnReason(ReturnReasonCode.convertor.valueOf(reason).name());
+                            }
+                            line.setReturnStatus(lineStatus);
                         }
-                        line.setReturnStatus(lineStatus);
                     }
                 }
                 line.setFulfillmentStatus(new FulfillmentStatusConvertor().toString(order.getFulfillment().getFulfillmentStatus()));

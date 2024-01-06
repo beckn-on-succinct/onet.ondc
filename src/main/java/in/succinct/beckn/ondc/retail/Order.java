@@ -133,10 +133,10 @@ public class Order extends in.succinct.beckn.Order {
     }
 
 
-    public ReconStatus getCounterPartyReconStatus(){
+    public ReconStatus getCounterpartyReconStatus(){
         return getEnum(ReconStatus.class, "counter_party_recon_status");
     }
-    public void setCounterPartyReconStatus(ReconStatus counter_party_recon_status){
+    public void setCounterpartyReconStatus(ReconStatus counter_party_recon_status){
         setEnum("counter_party_recon_status",counter_party_recon_status);
     }
 

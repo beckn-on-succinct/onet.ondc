@@ -1,6 +1,7 @@
 package in.succinct.beckn.ondc.retail;
 
 import in.succinct.beckn.Categories;
+import in.succinct.beckn.Locations;
 
 public class Provider extends in.succinct.beckn.Provider {
     @Override
@@ -41,4 +42,5 @@ public class Provider extends in.succinct.beckn.Provider {
     public void setCategories(Categories categories){
         rm("categories"); //Ondc does not want categories unless there is a customization enabled for that category.
     }
+
 }

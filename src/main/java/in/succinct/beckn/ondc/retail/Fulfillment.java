@@ -1,6 +1,6 @@
 package in.succinct.beckn.ondc.retail;
 
-import in.succinct.beckn.Provider.ServiceablityTags;
+import in.succinct.beckn.Fulfillment.FulfillmentStatus.FulfillmentStatusConvertor;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -17,15 +17,17 @@ public class Fulfillment extends in.succinct.beckn.Fulfillment {
 
     static final Map<String,FulfillmentType> ONDC_FULFILMENT_TYPES = new HashMap<>(){{
         put("Delivery",FulfillmentType.home_delivery);
-        put("Pickup",FulfillmentType.store_pickup);
-        put("Delivery and Pickup",FulfillmentType.store_pickup_and_home_delivery);
-        put("Reverse QC",FulfillmentType.return_to_origin);
+        put("Self-Pickup",FulfillmentType.store_pickup);
+        put("Delivery and Self-Pickup",FulfillmentType.store_pickup_and_home_delivery);
+        put("Return",FulfillmentType.return_to_origin);
+        put("Cancel",FulfillmentType.cancel);
     }};
     static final Map<FulfillmentType,String> ONDC_FULFILMENT_VALUES = new HashMap<>(){{
         put(FulfillmentType.home_delivery,"Delivery");
-        put(FulfillmentType.store_pickup,"Pickup");
-        put(FulfillmentType.store_pickup_and_home_delivery,"Delivery and Pickup");
-        put(FulfillmentType.return_to_origin,"Reverse QC");
+        put(FulfillmentType.store_pickup,"Self-Pickup");
+        put(FulfillmentType.store_pickup_and_home_delivery,"Delivery and Self-Pickup");
+        put(FulfillmentType.return_to_origin,"Return");
+        put(FulfillmentType.cancel,"Cancel");
     }};
 
     public FulfillmentType getType(){
@@ -65,4 +67,28 @@ public class Fulfillment extends in.succinct.beckn.Fulfillment {
     }
 
 
+    private static class OndcFulfillmentStatusConvertor extends EnumConvertor<FulfillmentStatus>{
+        @Override
+        public String toString(FulfillmentStatus value) {
+            if (value == FulfillmentStatus.Return_Liquidated){
+                return "Liquidated";
+            }else {
+                return super.toString(value);
+            }
+        }
+
+        @Override
+        public FulfillmentStatus valueOf(String enumRepresentation) {
+            if ("Liquidated".equals(enumRepresentation)){
+                return FulfillmentStatus.Return_Liquidated;
+            }else {
+                return super.valueOf(enumRepresentation);
+            }
+        }
+    }
+    private static final OndcFulfillmentStatusConvertor convertor = new OndcFulfillmentStatusConvertor();
+    @Override
+    public EnumConvertor<FulfillmentStatus> getFulfillmentStatusConvertor() {
+        return convertor;
+    }
 }

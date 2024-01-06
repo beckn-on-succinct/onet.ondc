@@ -326,7 +326,6 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
             if (complainantActions != null){
                 complainantActions.forEach(ca->{
                     Note note = new Note();
-                    note.setDescription(new Descriptor());
                     note.setCreatedBy(target.getComplainant());
                     note.setCreatedAt(ca.getUpdatedAt());
                     note.setAction(new Action());
