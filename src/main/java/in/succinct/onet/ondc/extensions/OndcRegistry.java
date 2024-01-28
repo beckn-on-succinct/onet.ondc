@@ -29,7 +29,6 @@ import in.succinct.beckn.ondc.registry.Entity.NetworkParticipant;
 import in.succinct.beckn.ondc.registry.Entity.NetworkParticipants;
 import in.succinct.beckn.ondc.registry.Entity.Pan;
 import in.succinct.beckn.ondc.registry.Message;
-import in.succinct.bpp.core.adaptor.NetworkApiAdaptor;
 import in.succinct.onet.core.adaptor.NetworkAdaptor;
 import org.json.simple.JSONObject;
 
