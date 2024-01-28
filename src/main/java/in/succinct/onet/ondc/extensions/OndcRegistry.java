@@ -30,6 +30,7 @@ import in.succinct.beckn.ondc.registry.Entity.NetworkParticipants;
 import in.succinct.beckn.ondc.registry.Entity.Pan;
 import in.succinct.beckn.ondc.registry.Message;
 import in.succinct.onet.core.adaptor.NetworkAdaptor;
+import in.succinct.onet.core.adaptor.NetworkApiAdaptor;
 import org.json.simple.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -46,6 +47,21 @@ public class OndcRegistry extends NetworkAdaptor {
 
     protected OndcRegistry(String networkName){
         super(networkName);
+    }
+
+
+    private NetworkApiAdaptor adaptor;
+    @Override
+    public NetworkApiAdaptor getApiAdaptor() {
+        if (adaptor != null){
+            return adaptor;
+        }
+        synchronized (this) {
+            if (adaptor == null) {
+                adaptor = super.getApiAdaptor();
+            }
+        }
+        return adaptor;
     }
 
     @Override
