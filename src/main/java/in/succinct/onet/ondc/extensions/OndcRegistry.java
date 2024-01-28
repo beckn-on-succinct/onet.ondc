@@ -17,11 +17,6 @@ import com.venky.swf.plugins.background.core.TaskManager;
 import com.venky.swf.routing.Config;
 import com.venky.swf.views.BytesView;
 import com.venky.swf.views.View;
-import com.venky.swf.views.controls.page.Body;
-import com.venky.swf.views.controls.page.Head;
-import com.venky.swf.views.controls.page.Html;
-import com.venky.swf.views.controls.page.Meta;
-import com.venky.swf.views.controls.page.text.Input;
 import in.succinct.beckn.Request;
 import in.succinct.beckn.Subscriber;
 import in.succinct.beckn.ondc.registry.Context;
@@ -34,8 +29,8 @@ import in.succinct.beckn.ondc.registry.Entity.NetworkParticipant;
 import in.succinct.beckn.ondc.registry.Entity.NetworkParticipants;
 import in.succinct.beckn.ondc.registry.Entity.Pan;
 import in.succinct.beckn.ondc.registry.Message;
-import in.succinct.bpp.core.adaptor.NetworkAdaptor;
-import in.succinct.bpp.core.adaptor.api.NetworkApiAdaptor;
+import in.succinct.bpp.core.adaptor.NetworkApiAdaptor;
+import in.succinct.onet.core.adaptor.NetworkAdaptor;
 import org.json.simple.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -43,7 +38,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public class OndcRegistry extends NetworkAdaptor {
@@ -53,12 +47,6 @@ public class OndcRegistry extends NetworkAdaptor {
 
     protected OndcRegistry(String networkName){
         super(networkName);
-    }
-
-    private final transient OndcApiAdaptor networkApiAdaptor = new OndcApiAdaptor(this);
-    @Override
-    public NetworkApiAdaptor getApiAdaptor() {
-        return networkApiAdaptor;
     }
 
     @Override

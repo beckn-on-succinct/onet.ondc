@@ -28,11 +28,12 @@ import in.succinct.beckn.Representative.Representatives;
 import in.succinct.beckn.Request;
 import in.succinct.beckn.Role;
 import in.succinct.bpp.core.adaptor.CommerceAdaptor;
-import in.succinct.bpp.core.adaptor.NetworkAdaptor;
-import in.succinct.bpp.core.adaptor.NetworkAdaptorFactory;
+import in.succinct.bpp.core.adaptor.NetworkApiAdaptor;
 import in.succinct.bpp.core.adaptor.igm.IssueTrackerFactory;
 import in.succinct.bpp.core.extensions.SuccinctIssueTracker;
 import in.succinct.json.JSONAwareWrapper.EnumConvertor;
+import in.succinct.onet.core.adaptor.NetworkAdaptor;
+import in.succinct.onet.core.adaptor.NetworkAdaptorFactory;
 import in.succinct.onet.ondc.extensions.OndcIssueTracker.GRO.GroType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -79,7 +80,7 @@ public class OndcIssueTracker extends SuccinctIssueTracker {
         Request oResponse = new Request();
 
         NetworkAdaptor networkAdaptor = NetworkAdaptorFactory.getInstance().getAdaptor(becknResponse.getContext().getNetworkId());
-        networkAdaptor.getApiAdaptor().createReplyContext(getAdaptor().getSubscriber(),becknResponse,oResponse);
+        ((NetworkApiAdaptor)networkAdaptor.getApiAdaptor()).createReplyContext(getAdaptor().getSubscriber(),becknResponse,oResponse);
         oResponse.getContext().setNetworkId(becknResponse.getContext().getNetworkId());
         b2o(becknResponse,oResponse);
         return oResponse;
