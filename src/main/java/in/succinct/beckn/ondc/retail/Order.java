@@ -3,6 +3,7 @@ package in.succinct.beckn.ondc.retail;
 import in.succinct.beckn.Amount;
 import in.succinct.beckn.Cancellation;
 import in.succinct.beckn.Descriptor;
+import in.succinct.beckn.Fulfillments;
 import in.succinct.beckn.Payer;
 import in.succinct.beckn.SettlementCorrection;
 
@@ -171,5 +172,15 @@ public class Order extends in.succinct.beckn.Order {
     public void setBapTaxNumber(String bap_tax_number){
         setTag("bap_terms","tax_number",bap_tax_number);
     }
+
+    @Override
+    public Fulfillments getFulfillments(){
+        return get(Fulfillments.class, "fulfillments");
+    }
+    @Override
+    public void setFulfillments(Fulfillments fulfillments){
+        set("fulfillments",fulfillments);
+    }
+
 
 }

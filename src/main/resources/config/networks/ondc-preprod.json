@@ -1,4 +1,5 @@
 {
+  "wild_card":"*",
   "self_registration_supported": true,
   "subscription_needed_post_registration" : false,
   "base_url": "https://preprod.registry.ondc.org/ondc",

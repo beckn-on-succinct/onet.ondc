@@ -151,5 +151,15 @@ public class Payment extends in.succinct.beckn.Payment {
         set("@ondc/org/settlement_details",settlement_details.getInner());
     }
 
+    @Override
+    public CollectedBy getCollectedBy(){
+        String s = get("collected_by");
+        return s == null ? null : CollectedBy.valueOf(s);
+    }
+
+    @Override
+    public void setCollectedBy(CollectedBy collected_by){
+        set("collected_by",collected_by == null ? null : collected_by.toString());
+    }
 
 }

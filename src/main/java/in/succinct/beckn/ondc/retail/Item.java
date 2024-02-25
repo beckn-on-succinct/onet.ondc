@@ -1,6 +1,7 @@
 package in.succinct.beckn.ondc.retail;
 
 import com.venky.core.util.ObjectUtil;
+import in.succinct.beckn.ItemQuantity;
 import org.json.simple.JSONObject;
 
 import java.time.Duration;
@@ -135,5 +136,13 @@ public class Item extends in.succinct.beckn.Item {
         setTag("veg_nonveg","veg",veg == null ? null : (veg ? "yes" : "no"));
     }
 
+    @Override
+    public ItemQuantity getTentativeItemQuantity() {
+        return super.getItemQuantity();
+    }
 
+    @Override
+    public void setTentativeItemQuantity(ItemQuantity quantity) {
+        super.setItemQuantity(quantity);
+    }
 }
