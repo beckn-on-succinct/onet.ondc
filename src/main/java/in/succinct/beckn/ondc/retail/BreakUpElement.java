@@ -1,6 +1,7 @@
 package in.succinct.beckn.ondc.retail;
 
 import in.succinct.beckn.BreakUp;
+import in.succinct.beckn.Item;
 import in.succinct.beckn.Quantity;
 
 public class BreakUpElement extends BreakUp.BreakUpElement {
@@ -49,6 +50,12 @@ public class BreakUpElement extends BreakUp.BreakUpElement {
         setTitleType(type);
     }
 
+    public Item getItem(){
+        return get(Item.class, "item");
+    }
+    public void setItem(Item item){
+        set("item",item);
+    }
 
 
 }
