@@ -140,6 +140,24 @@
          "schema" : "/config/networks/local_retail_ondc.yaml"
       },
       {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:SRV10",
+         "name" : "Skilled Services - Appliances Repair Services",
+         "schema" : "/config/networks/ondc_services_2_0.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:SRV11",
+         "name" : "Skilled Services - Infra Services",
+         "schema" : "/config/networks/ondc_services_2_0.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:SRV12",
+         "name" : "Skilled Services - Personal Care Services",
+         "schema" : "/config/networks/ondc_services_2_0.yaml"
+      },
+      {
          "extension_package" : "in.succinct.beckn.ondc.rsp",
          "id" : "ONDC:NTS10",
          "name" : "recon",
