@@ -1,5 +1,17 @@
 {
+   "wild_card":"*",
+   "self_registration_supported" : true,
+   "subscription_needed_post_registration" : false,
    "base_url" : "https://staging.registry.ondc.org",
+   "key_expiry_grace_period" : 2880,
+   "unique_key_id" : "ukId",
+   "registry" : {
+      "subscriber_id" : "staging.registry.ondc.org",
+      "subscriber_url" : "https://staging.registry.ondc.org",
+      "encr_public_key" : "MCowBQYDK2VuAyEAduMuZgmtpjdCuxv+Nc49K0cB6tL/Dj3HZetvVN7ZekM=",
+      "type" : "LREG"
+   },
+   "extension_package" : "in.succinct.beckn.ondc.common",
    "domains" : [
       {
          "extension_package" : "in.succinct.beckn.ondc.retail",
@@ -164,24 +176,14 @@
          "schema" : "/config/networks/rsp.yaml",
          "version" : ""
       }
+
    ],
-   "extension_package" : "in.succinct.beckn.ondc.common",
    "igm_policy" : {
       "ack_minutes" : 120,
+      "resolve_by_minutes_np" : 24,
       "escalate_to_gro_within_hours" : 48,
-      "escalate_to_odr_within_hours" : 24,
-      "resolve_by_days_odr" : 21,
       "resolve_by_minutes_gro" : 96,
-      "resolve_by_minutes_np" : 24
-   },
-   "key_expiry_grace_period" : 2880,
-   "registry" : {
-      "encr_public_key" : "MCowBQYDK2VuAyEAduMuZgmtpjdCuxv+Nc49K0cB6tL/Dj3HZetvVN7ZekM=",
-      "subscriber_id" : "staging.registry.ondc.org",
-      "subscriber_url" : "https://staging.registry.ondc.org",
-      "type" : "LREG"
-   },
-   "self_registration_supported" : true,
-   "subscription_needed_post_registration" : false,
-   "unique_key_id" : "ukId"
+      "escalate_to_odr_within_hours" : 24,
+      "resolve_by_days_odr" : 21
+   }
 }
