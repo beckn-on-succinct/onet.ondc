@@ -50,12 +50,6 @@ public class BreakUpElement extends BreakUp.BreakUpElement {
         setTitleType(type);
     }
 
-    public Item getItem(){
-        return get(Item.class, "item");
-    }
-    public void setItem(Item item){
-        set("item",item);
-    }
 
 
 }
