@@ -41,9 +41,6 @@ import java.util.Date;
 import java.util.UUID;
 
 public class OndcRegistry extends NetworkAdaptor {
-    protected OndcRegistry(){
-
-    }
 
     protected OndcRegistry(String networkName){
         super(networkName);
