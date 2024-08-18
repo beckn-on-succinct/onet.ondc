@@ -20,20 +20,21 @@ public class Fulfillment extends in.succinct.beckn.Fulfillment {
         put("Return", "return_to_origin");
         put("Cancel", "cancel");
     }};
-    static final Map<RetailFulfillmentType,String> ONDC_FULFILMENT_VALUES = new HashMap<>(){{
-        put(RetailFulfillmentType.home_delivery,"Delivery");
-        put(RetailFulfillmentType.store_pickup,"Self-Pickup");
-        put(RetailFulfillmentType.store_pickup_and_home_delivery,"Delivery and Self-Pickup");
-        put(RetailFulfillmentType.return_to_origin,"Return");
-        put(RetailFulfillmentType.cancel,"Cancel");
+    static final Map<String,String> ONDC_FULFILMENT_VALUES = new HashMap<>(){{
+        put(RetailFulfillmentType.home_delivery.toString(),"Delivery");
+        put(RetailFulfillmentType.store_pickup.toString(),"Self-Pickup");
+        put(RetailFulfillmentType.store_pickup_and_home_delivery.toString(),"Delivery and Self-Pickup");
+        put(RetailFulfillmentType.return_to_origin.toString(),"Return");
+        put(RetailFulfillmentType.cancel.toString(),"Cancel");
     }};
 
     public String getType(){
         String s = get("type");
-        return ONDC_FULFILMENT_TYPES.get(s);
+        return ONDC_FULFILMENT_TYPES.getOrDefault(s,s);
     }
     public void setType(String type){
-        set("type",ONDC_FULFILMENT_VALUES.get(type));
+        set("type",ONDC_FULFILMENT_VALUES.getOrDefault(type,type));
+
     }
 
     @Override
