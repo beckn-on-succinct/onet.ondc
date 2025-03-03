@@ -3,9 +3,7 @@ package in.succinct.beckn.ondc.retail;
 import in.succinct.beckn.Amount;
 import in.succinct.beckn.Cancellation;
 import in.succinct.beckn.Descriptor;
-import in.succinct.beckn.Fulfillments;
 import in.succinct.beckn.Payer;
-import in.succinct.beckn.SettlementCorrection;
 
 public class Order extends in.succinct.beckn.Order {
     @Override
@@ -51,12 +49,6 @@ public class Order extends in.succinct.beckn.Order {
         set("withholding_tax_gst",gst_withheld);
     }
 
-    public OrderReconStatus getOrderReconStatus(){
-        return getEnum(OrderReconStatus.class, "order_recon_status");
-    }
-    public void setOrderReconStatus(OrderReconStatus order_recon_status){
-        setEnum("order_recon_status",order_recon_status);
-    }
 
 
 
@@ -83,20 +75,6 @@ public class Order extends in.succinct.beckn.Order {
     }
 
 
-    public SettlementReasonCode getSettlementReasonCode(){
-        return getEnum(SettlementReasonCode.class, "settlement_reason_code", in.succinct.beckn.Order.SettlementReasonCode.convertor);
-    }
-    public void setSettlementReasonCode(SettlementReasonCode settlement_reason_code){
-        setEnum("settlement_reason_code",settlement_reason_code, SettlementReasonCode.convertor);
-    }
-
-    public SettlementCorrection getSettlementCorrection(){
-        return get(SettlementCorrection.class, "correction");
-    }
-    public void setSettlementCorrection(SettlementCorrection settlement_correction){
-        set("correction",settlement_correction);
-    }
-
     public String getCollectionTransactionId(){
         return get("transaction_id");
     }
@@ -119,12 +97,6 @@ public class Order extends in.succinct.beckn.Order {
     }
 
 
-    public ReconStatus getReconStatus(){
-        return getEnum(ReconStatus.class, "recon_status" , ReconStatus.convertor);
-    }
-    public void setReconStatus(ReconStatus recon_status){
-        setEnum("recon_status",recon_status, ReconStatus.convertor);
-    }
 
     public Double getDiffAmount(){
         return getDouble("diff_amount", null);
@@ -134,12 +106,6 @@ public class Order extends in.succinct.beckn.Order {
     }
 
 
-    public ReconStatus getCounterpartyReconStatus(){
-        return getEnum(ReconStatus.class, "counter_party_recon_status");
-    }
-    public void setCounterpartyReconStatus(ReconStatus counter_party_recon_status){
-        setEnum("counter_party_recon_status",counter_party_recon_status);
-    }
 
     public Double getCounterPartyDiffAmount(){
         return getDouble("counter_party_diff_amount",null);
@@ -156,31 +122,17 @@ public class Order extends in.succinct.beckn.Order {
     }
 
 
-    @Override
     public String getBppTaxNumber(){
         return getTag("bpp_terms","tax_number");
     }
-    @Override
     public void setBppTaxNumber(String bpp_tax_number){
         setTag("bpp_terms","tax_number", bpp_tax_number);
     }
-    @Override
     public String getBapTaxNumber(){
         return getTag("bap_terms","tax_number");
     }
-    @Override
     public void setBapTaxNumber(String bap_tax_number){
         setTag("bap_terms","tax_number",bap_tax_number);
     }
-
-    @Override
-    public Fulfillments getFulfillments(){
-        return get(Fulfillments.class, "fulfillments");
-    }
-    @Override
-    public void setFulfillments(Fulfillments fulfillments){
-        set("fulfillments",fulfillments);
-    }
-
 
 }

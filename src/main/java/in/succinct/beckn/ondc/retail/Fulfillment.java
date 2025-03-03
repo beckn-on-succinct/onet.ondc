@@ -69,7 +69,7 @@ public class Fulfillment extends in.succinct.beckn.Fulfillment {
     private static class OndcFulfillmentStatusConvertor extends EnumConvertor<FulfillmentStatus>{
         @Override
         public String toString(FulfillmentStatus value) {
-            if (value == FulfillmentStatus.Return_Liquidated){
+            if (value == FulfillmentStatus.Void){
                 return "Liquidated";
             }else {
                 return super.toString(value);
@@ -79,7 +79,7 @@ public class Fulfillment extends in.succinct.beckn.Fulfillment {
         @Override
         public FulfillmentStatus valueOf(String enumRepresentation) {
             if ("Liquidated".equals(enumRepresentation)){
-                return FulfillmentStatus.Return_Liquidated;
+                return FulfillmentStatus.Void;
             }else {
                 return super.valueOf(enumRepresentation);
             }
