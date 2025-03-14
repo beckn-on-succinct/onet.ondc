@@ -39,7 +39,157 @@
       "version": "",
       "schema": "/config/networks/rsp.yaml",
       "extension_package": "in.succinct.beckn.ondc.rsp"
-    }
+    },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET11",
+         "name" : "F&B",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET12",
+         "name" : "Fashion",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET13",
+         "name" : "BPC",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET14",
+         "name" : "Electronics",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET15",
+         "name" : "Appliances",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET16",
+         "name" : "Home & Decor",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET17",
+         "name" : "Toy & Games",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET18",
+         "name" : "Health & Wellness",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET19",
+         "name" : "Pharma",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:RET20",
+         "name" : "Auto Components & Accessories",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:NTS11",
+         "name" : "ODR",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:TRV10",
+         "name" : "Ride Hailing",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:TRV11",
+         "name" : "Ticket(unreserved)",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:TRV12",
+         "name" : "Ticket(reserved)",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:FIS10",
+         "name" : "Gift Card",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:FIS11",
+         "name" : "Fast Tag",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:FIS12",
+         "name" : "Credit",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:FIS13",
+         "name" : "Insurance",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:FIS14",
+         "name" : "Investments",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:AGR10",
+         "name" : "Agri inputs",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:AGR11",
+         "name" : "Agri Outputs",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:AGR12",
+         "name" : "Agri services",
+         "schema" : "/config/networks/local_retail_ondc.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:SRV10",
+         "name" : "Skilled Services - Appliances Repair Services",
+         "schema" : "/config/networks/ondc_services_2_0.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:SRV11",
+         "name" : "Skilled Services - Infra Services",
+         "schema" : "/config/networks/ondc_services_2_0.yaml"
+      },
+      {
+         "extension_package" : "in.succinct.beckn.ondc.retail",
+         "id" : "ONDC:SRV12",
+         "name" : "Skilled Services - Personal Care Services",
+         "schema" : "/config/networks/ondc_services_2_0.yaml"
+      }
 
   ],
   "igm_policy": {
