@@ -63,7 +63,7 @@ public class OndcRegistry extends NetworkAdaptor {
 
     @Override
     public void register(Subscriber subscriber) {
-        register(subscriber,ObjectUtil.equals(subscriber.getType(),Subscriber.SUBSCRIBER_TYPE_BAP) ? 1 : subscriber.isMsn() ? 3 : 2);
+        register(subscriber,ObjectUtil.equals(subscriber.getType(),Subscriber.SUBSCRIBER_TYPE_BAP) ? 1 : 2);
     }
      public void register(Subscriber subscriber, int opsNo) {
         Request request = new Request();
